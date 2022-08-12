@@ -1,6 +1,7 @@
 #ifndef __BASICE_TOOLS_H__
 #define __BASICE_TOOLS_H__
 
+#include <cstdio>
 
 #define LOG_BASE(type, ...)\
     do{ \

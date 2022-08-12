@@ -21,14 +21,10 @@ class Tensor{
      };
 
      using tensor_type = ETENOSR_TYPE;
-     Tensor() = delete;
+     Tensor(){};
 
      Tensor(std::vector<int> shape, tensor_type type = ETENOSR_TYPE::TYPE_FP32, float val = 0);
-     Tensor(std::vector<int> shape, std::vector<bool> vals, tensor_type type = ETENOSR_TYPE::TYPE_BOOL);
-     Tensor(std::vector<int> shape, std::vector<char> vals, tensor_type type = ETENOSR_TYPE::TYPE_CHAR);
      Tensor(std::vector<int> shape, std::vector<float> vals, tensor_type type = ETENOSR_TYPE::TYPE_FP32);
-     Tensor(std::vector<int> shape, std::vector<int> vals, tensor_type type = ETENOSR_TYPE::TYPE_INT32);
-     Tensor(std::vector<int> shape, std::vector<double> vals, tensor_type type = ETENOSR_TYPE::TYPE_DOUBLE);
      Tensor(const Tensor& rhs);
 
      ~Tensor();
@@ -42,6 +38,7 @@ class Tensor{
 
 public:
      Tensor& operator=(const Tensor& rhs);
+     bool operator==(const Tensor& rhs);
 
 
  private:
@@ -49,10 +46,10 @@ public:
      void _free();
 
  private:
-     size_t size_;
+     size_t size_ = 0;
      tensor_type type_;
      std::vector<int> shape_;
-     void* data_;
+     void* data_ = NULL;
 };
 
 }

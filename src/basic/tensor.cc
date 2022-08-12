@@ -13,32 +13,13 @@ namespace leptinfer{
 
 Tensor::Tensor(std::vector<int> shape, tensor_type type, float val){
     _init(shape, type);
-    std::fill_n(TYPE_TO_PTR(data_, type_), size_, val);
+    std::fill_n((float*)data_, size_, val);
 }
 
-Tensor::Tensor(std::vector<int> shape, std::vector<bool> vals, tensor_type type){
-    _init(shape, type);
-    std::copy(vals.begin(), vals.end(), TYPE_TO_PTR(data_, type));
-}
-
-Tensor::Tensor(std::vector<int> shape, std::vector<char> vals, tensor_type type){
-    _init(shape, type);
-    std::copy(vals.begin(), vals.end(), TYPE_TO_PTR(data_, type));
-}
-
-Tensor::Tensor(std::vector<int> shape, std::vector<int> vals, tensor_type type){
-    _init(shape, type);
-    std::copy(vals.begin(), vals.end(), TYPE_TO_PTR(data_, type));
-}
 
 Tensor::Tensor(std::vector<int> shape, std::vector<float> vals, tensor_type type){
     _init(shape, type);
-    std::copy(vals.begin(), vals.end(), TYPE_TO_PTR(data_, type));
-}
-
-Tensor::Tensor(std::vector<int> shape, std::vector<double> vals, tensor_type type){
-    _init(shape, type);
-    std::copy(vals.begin(), vals.end(), TYPE_TO_PTR(data_, type));
+    std::copy(vals.begin(), vals.end(), (float*)data_);
 }
 
 Tensor::Tensor(const Tensor& rhs){
@@ -59,6 +40,11 @@ Tensor& Tensor::operator=(const Tensor& rhs) {
     _init(rhs.shape_, rhs.type_);
     memcpy(data_, rhs.data_, rhs.size_);
     return *this;
+}
+
+bool Tensor::operator==(const Tensor& rhs) {
+    if(rhs.shape_ != shape_) return false;
+    return memcmp(data_, rhs.data_, size_) == 0;
 }
 
 void Tensor::_init(std::vector<int> shape, tensor_type type) {
@@ -85,13 +71,13 @@ void Tensor::_init(std::vector<int> shape, tensor_type type) {
 
     shape_ = shape;
     type_  = type;
-    data_  = malloc(size_);
 }
 
 void Tensor::_free() {
-    if(data_ != NULL){
+    if(data_ != NULL && size_ > 0){
         free(data_);
         data_ = NULL;
+        size_ = 0;
     }
     shape_.clear();
 }
