@@ -1,4 +1,7 @@
 #include "operator/opbase.h"
+
+#include <cmath>
+
 #include "basic/tools.h"
 
 
@@ -35,20 +38,30 @@ Tensor  gemm(const Tensor& a, const Tensor& b) {
 
 }
 
-void _add(std::vector<int>& shape, std::vector<int>& idx, int p, const Tensor& a, const Tensor& b, Tensor& c){
+void _base(std::vector<int>& shape, std::vector<int>& idx, int p, const Tensor& a, const Tensor& b, Tensor& c, int op = 0, int ndim = -1, int val = -1){
     if(idx.size() == shape.size()) {
-        c(idx) = a(idx) + b(idx);
+        if(ndim != -1)  idx[ndim] = val;
+        switch(op) {
+            case 0: c(idx) = a(idx) + b(idx); break;
+            case 1: c(idx) = a(idx) - b(idx); break;
+            case 2: c(idx) = a(idx) * b(idx); break;
+            case 3: c(idx) = a(idx) / b(idx); break;
+        }
         return ;
     }
 
     for(int i = 0; i < shape[p]; ++ i) {
         idx.push_back(i);
-        _add(shape, idx, p + 1, a, b, c);
+        _base(shape, idx, p + 1, a, b, c, op, ndim, val);
         idx.pop_back();
     }
 
 }
-Tensor add(const Tensor& a, const Tensor& b) {
+
+/*
+ * +-/
+ */
+Tensor asmd_base(const Tensor& a, const Tensor& b, int op) {
     if(a.shape().size() != b.shape().size()) {
         ERROR("dimension mismatch");
     }
@@ -61,8 +74,70 @@ Tensor add(const Tensor& a, const Tensor& b) {
 
     Tensor c(sc);
     std::vector<int> temp;
-    _add(sc, temp, 0, a, b, c);
+    _base(sc, temp, 0, a, b, c, op);
+
+    return c;
+
+}
+Tensor add(const Tensor& a, const Tensor& b) {
+    return asmd_base(a, b, 0);
+}
+
+Tensor sub(const Tensor& a, const Tensor& b) {
+    return asmd_base(a, b, 1);
+}
+
+Tensor div(const Tensor& a, const Tensor& b) {
+    return asmd_base(a, b, 3);
+}
+
+Tensor mut(const Tensor& a, const Tensor& b) {
+    return asmd_base(a, b, 2);
+}
+
+Tensor sum(const Tensor& a, int dim) {
+    Tensor c(a);
+    if(dim == -1) {
+        float* ptr = (float*)c.data();
+        float s = 0;
+        for(int i = 0; i < c.size(); ++ i)
+            s += ptr[i];
+        c = Tensor(std::vector<int>(a.shape().size(), 1), {s});
+    }else{
+        auto shape = c.shape();
+        int n = shape[dim];
+        shape[dim] = 1;
+        c = Tensor(shape);
+
+        for(int i = 0; i < n; ++ i) {
+            std::vector<int> idx;
+            _base(shape, idx, 0, c, a, c, 0, dim, i);
+        }
+    }
 
     return c;
 }
+
+
+
+Tensor exp(const Tensor& a) {
+    Tensor c(a);
+    float* ptr = (float*)c.data();
+    for(int i = 0; i < c.size(); ++ i)
+        ptr[i] = std::exp(ptr[i]);
+
+    return c;
+}
+
+Tensor tanh(const Tensor& a){
+
+    Tensor c(a);
+    float* ptr = (float*)c.data();
+    for(int i = 0; i < c.size(); ++ i)
+        ptr[i] = std::tanh(ptr[i]);
+
+    return c;
+
+}
+
 } 

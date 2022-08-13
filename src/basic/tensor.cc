@@ -47,8 +47,15 @@ Tensor& Tensor::operator=(const Tensor& rhs) {
 }
 
 bool Tensor::operator==(const Tensor& rhs) {
+    float eps = 1e-4;
     if(rhs.shape_ != shape_) return false;
-    return memcmp(data_, rhs.data_, size_) == 0;
+    float* p1 = (float *)data_;
+    float* p2 = (float *)rhs.data_;
+    for(int i = 0; i < size_ / 4; ++ i) {
+        if(std::abs(p1[i] - p2[i]) > eps) return false;
+    }
+
+    return true;
 }
 
 float& Tensor::operator()(std::vector<int> idx) {

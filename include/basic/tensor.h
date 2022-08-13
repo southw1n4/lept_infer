@@ -35,6 +35,7 @@ class Tensor{
      const void* data() const {return data_;}
      void* data() {return data_;}
      tensor_type type() const {return type_;}
+     int size() const {return size_ / 4;}
 
 public:
      Tensor& operator=(const Tensor& rhs);

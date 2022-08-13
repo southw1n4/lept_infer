@@ -15,6 +15,16 @@ Tensor gemm(const Tensor&, const Tensor&);
 
 Tensor add(const Tensor&, const Tensor&);
 
+Tensor sum(const Tensor&, int dim = -1);
+Tensor sub(const Tensor&, const Tensor&);
+Tensor mut(const Tensor&, const Tensor&);
+Tensor div(const Tensor&, const Tensor&);
+
+Tensor exp(const Tensor&);
+
+
+Tensor tanh(const Tensor&);
+
 }
 
 #endif
