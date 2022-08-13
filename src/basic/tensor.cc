@@ -10,10 +10,14 @@
 
 namespace leptinfer{
 
+Tensor::Tensor() {
+    _init({0}, tensor_type::TYPE_FP32);
+}
+
 
 Tensor::Tensor(std::vector<int> shape, tensor_type type, float val){
     _init(shape, type);
-    std::fill_n((float*)data_, size_, val);
+    std::fill_n((float*)data_, size_ / 4, val);
 }
 
 
@@ -47,6 +51,28 @@ bool Tensor::operator==(const Tensor& rhs) {
     return memcmp(data_, rhs.data_, size_) == 0;
 }
 
+float& Tensor::operator()(std::vector<int> idx) {
+    int num = size_ / 4, offset = 0;
+    for(int i = 0; i < idx.size(); ++ i) {
+        num /= shape_[i];
+        int p = std::min(shape_[i] - 1, idx[i]);
+
+        offset += p * num;
+    }
+    return ((float*)data_)[offset];
+}
+
+float Tensor::operator()(std::vector<int> idx) const {
+    int num = size_ / 4, offset = 0;
+    for(int i = 0; i < idx.size(); ++ i) {
+        num /= shape_[i];
+        int p = std::min(shape_[i] - 1, idx[i]);
+
+        offset += p * num;
+    }
+    return ((float*)data_)[offset];
+
+}
 void Tensor::_init(std::vector<int> shape, tensor_type type) {
     size_ = std::accumulate(shape.begin(), shape.end(), 1, std::multiplies<int>());
 
@@ -71,6 +97,7 @@ void Tensor::_init(std::vector<int> shape, tensor_type type) {
 
     shape_ = shape;
     type_  = type;
+    if(size_ > 0) data_ = malloc(size_);
 }
 
 void Tensor::_free() {

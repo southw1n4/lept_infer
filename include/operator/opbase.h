@@ -10,6 +10,11 @@ class Op{
     virtual Tensor operator()(const Tensor&) = 0;
 
 };
+
+Tensor gemm(const Tensor&, const Tensor&);
+
+Tensor add(const Tensor&, const Tensor&);
+
 }
 
 #endif

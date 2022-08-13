@@ -7,7 +7,7 @@
 namespace leptinfer{
 class Linear: public Op{
  public:
-    Linear(int input_dim, int output_dim, bool required_bias = true);
+    Linear(int input_dim, int output_dim, bool required_bias = false);
     ~Linear();
     virtual Tensor operator()(const Tensor&) override;
 
@@ -16,9 +16,9 @@ class Linear: public Op{
     void set_bias(const Tensor&);
 
  private:
-    Tensor weight_;
-    Tensor bias_;
-    bool required_bias_ = true;
+    Tensor* weight_ = NULL;
+    Tensor* bias_ = NULL;
+    bool required_bias_ = false;
 
 
 }; 

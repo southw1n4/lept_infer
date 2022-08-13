@@ -21,7 +21,7 @@ class Tensor{
      };
 
      using tensor_type = ETENOSR_TYPE;
-     Tensor(){};
+     Tensor();
 
      Tensor(std::vector<int> shape, tensor_type type = ETENOSR_TYPE::TYPE_FP32, float val = 0);
      Tensor(std::vector<int> shape, std::vector<float> vals, tensor_type type = ETENOSR_TYPE::TYPE_FP32);
@@ -39,6 +39,8 @@ class Tensor{
 public:
      Tensor& operator=(const Tensor& rhs);
      bool operator==(const Tensor& rhs);
+     float& operator()(std::vector<int>);
+     float operator()(std::vector<int>) const;
 
 
  private:
