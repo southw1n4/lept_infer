@@ -3,6 +3,7 @@
 #include <cmath>
 #include <functional>
 #include <numeric>
+#include <iostream>
 
 #include "operator/linear.h"
 #include "operator/activate.h"
@@ -120,11 +121,33 @@ bool test_conv2d() {
 }
 
 bool test_maxpool2d() {
-    auto x = Tensor({2, 2, 2, 2}, {1, 2, 3, 4, 5, 6, 7, 8,
-                                   1, 2, 3, 4, 5, 6, 7, 8});
+    auto x = Tensor({2, 2, 4, 4}, {1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 5, 6, 7, 8,
+                                  1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 5, 6, 7, 8,
+                                  1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 5, 6, 7, 8,
+                                  1, 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4, 5, 6, 7, 8,});
 
-    auto z = Tensor({2, 2, 1, 1}, {4, 8, 4, 8});
+    auto z1 = Tensor({2, 2, 2, 2}, {6, 8, 6, 8, 6, 8, 6, 8, 6, 8, 6, 8, 6, 8, 6, 8});
+    auto z2 = Tensor({2, 2, 3, 3}, {1, 3, 4, 5, 7, 8, 5, 7, 8,
+                                    1, 3, 4, 5, 7, 8, 5, 7, 8,
+                                    1, 3, 4, 5, 7, 8, 5, 7, 8,
+                                    1, 3, 4, 5, 7, 8, 5, 7, 8
+                                    });
     auto op = MaxPool2d(2, 2, 0);
+    bool flag1 = op(x) == z1;
+
+    op = MaxPool2d(2, 2, 1);
+    bool flag2 = op(x) == z2;
+    
+    return flag2 && flag1;
+}
+
+bool test_relu() {
+    auto x = Tensor({2, 2}, {-1, 3, 0, -2});
+    auto op = ReLU();
+    auto z = Tensor({2, 2}, {0, 3, 0, 0});
+
+    auto y = Tensor({3, 3, 3, 3}); 
+
 
     return op(x) == z;
 }
@@ -137,6 +160,7 @@ void test_op() {
     TEST(test_tanh);
     TEST(test_conv2d);
     TEST(test_maxpool2d);
+    TEST(test_relu);
     printf("PASS: %d/%d\n",op_true, op_cnt);
     printf("=========================TEST_OP=========================\n");
 

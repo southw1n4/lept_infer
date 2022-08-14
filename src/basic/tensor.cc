@@ -5,6 +5,7 @@
 #include <numeric>
 #include <algorithm>
 #include <cstring>
+#include <string>
 
 #include "basic/tools.h"
 
@@ -114,6 +115,23 @@ void Tensor::_free() {
         size_ = 0;
     }
     shape_.clear();
+}
+
+inline
+void _output_helper_helper(std::vector<int>& shape, int p, std::vector<int>idx, std::ostream& o){
+
+    int t = idx.back();
+
+}
+
+
+std::ostream& operator<<(std::ostream& o, const Tensor& t) {
+
+    /*TODO
+     *
+     */
+
+    return o;
 }
 
 }

@@ -19,7 +19,17 @@ class TanH: public Op{
      virtual ~TanH() override {};
      virtual Tensor operator()(const Tensor&) override;
 };
-}
 
+class ReLU: public Op{
+ public:
+     ReLU(){};
+     ~ReLU(){};
+
+     virtual Tensor operator()(const Tensor&) override;
+
+
+};
+
+}
 
 #endif

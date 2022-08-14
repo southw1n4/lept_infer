@@ -3,6 +3,7 @@
 
 #include <cstddef>
 #include <vector>
+#include <ostream>
 
 namespace leptinfer{
 
@@ -55,6 +56,7 @@ public:
      void* data_ = NULL;
 };
 
+std::ostream& operator <<(std::ostream&, const Tensor&);
 }
 
 #endif
