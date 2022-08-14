@@ -6,6 +6,9 @@
 
 #include "operator/linear.h"
 #include "operator/activate.h"
+#include "operator/conv.h"
+
+#include "basic/tensor.h"
 
 static int op_cnt = 0;
 static int op_true = 0;
@@ -18,7 +21,7 @@ using namespace leptinfer;
             op_true++;\
             printf("%s\t.....................................[OK]\n", #func); \
         }\
-        else{\
+    else{\
             printf("%s\t.................................[FAILED]\n", #func); \
         }\
     }while(0)
@@ -79,6 +82,42 @@ bool test_tanh() {
 
 }
 
+bool test_conv2d() {
+    auto x = Tensor({2, 3, 3, 3}, Tensor::tensor_type::TYPE_FP32, 1);
+    auto w = Tensor({3, 3, 3, 3}, Tensor::tensor_type::TYPE_FP32, 1);
+    auto b = Tensor({3}, {0, 1 ,2});
+    auto z1 = Tensor({2, 3, 1, 1}, Tensor::tensor_type::TYPE_FP32, 27);
+    auto z2 = Tensor({2, 3, 3, 3}, {12, 18, 12, 18, 27, 18, 12, 18, 12,
+                                     12, 18, 12, 18, 27, 18, 12, 18, 12,
+                                     12, 18, 12, 18, 27, 18, 12, 18, 12,
+                                     12, 18, 12, 18, 27, 18, 12, 18, 12,
+                                     12, 18, 12, 18, 27, 18, 12, 18, 12,
+                                     12, 18, 12, 18, 27, 18, 12, 18, 12});
+
+    auto z3 = Tensor({2, 3, 3, 3}, {12, 18, 12, 18, 27, 18, 12, 18, 12,
+                                     13, 19, 13, 19, 28, 19, 13, 19, 13,
+                                     14, 20, 14, 20, 29, 20, 14, 20, 14,
+                                     12, 18, 12, 18, 27, 18, 12, 18, 12,
+                                     13, 19, 13, 19, 28, 19, 13, 19, 13,
+                                     14, 20, 14, 20, 29, 20, 14, 20, 14});
+                                     
+
+    auto op1 = Conv2d(3, 3, 3, 1, 0);
+    op1.set_weight(w);
+    bool flag1 = (z1 == op1(x));
+
+    auto op2 = Conv2d(3, 3, 3, 1, 1);
+    op2.set_weight(w);
+    bool flag2 = (z2 == op2(x));
+
+    auto op3 = Conv2d(3, 3, 3, 1, 1, true);
+    op3.set_weight(w);
+    op3.set_bias(b);
+    bool flag3 = (z3 == op3(x));
+
+    return flag1 && flag2 && flag3;
+}
+
 
 
 void test_op() {
@@ -86,7 +125,8 @@ void test_op() {
     TEST(test_linear);
     TEST(test_softmax);
     TEST(test_tanh);
-    printf("PASS:\t%d\nALL:\t%d\n",op_true, op_cnt);
+    TEST(test_conv2d);
+    printf("PASS: %d/%d\n",op_true, op_cnt);
     printf("=========================TEST_OP=========================\n");
 
 }
