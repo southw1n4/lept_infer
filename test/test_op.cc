@@ -7,6 +7,7 @@
 #include "operator/linear.h"
 #include "operator/activate.h"
 #include "operator/conv.h"
+#include "operator/pool.h"
 
 #include "basic/tensor.h"
 
@@ -118,6 +119,15 @@ bool test_conv2d() {
     return flag1 && flag2 && flag3;
 }
 
+bool test_maxpool2d() {
+    auto x = Tensor({2, 2, 2, 2}, {1, 2, 3, 4, 5, 6, 7, 8,
+                                   1, 2, 3, 4, 5, 6, 7, 8});
+
+    auto z = Tensor({2, 2, 1, 1}, {4, 8, 4, 8});
+    auto op = MaxPool2d(2, 2, 0);
+
+    return op(x) == z;
+}
 
 
 void test_op() {
@@ -126,6 +136,7 @@ void test_op() {
     TEST(test_softmax);
     TEST(test_tanh);
     TEST(test_conv2d);
+    TEST(test_maxpool2d);
     printf("PASS: %d/%d\n",op_true, op_cnt);
     printf("=========================TEST_OP=========================\n");
 
