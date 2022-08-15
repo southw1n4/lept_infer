@@ -117,10 +117,75 @@ void Tensor::_free() {
     shape_.clear();
 }
 
-inline
-void _output_helper_helper(std::vector<int>& shape, int p, std::vector<int>idx, std::ostream& o){
+std::string _fix(std::string s) {
 
-    int t = idx.back();
+    bool comma = false;
+    for(char c: s) if(c == ',') comma = true;
+
+    int cnt_brackets = 0;
+    for(char c: s) if(c == ']') cnt_brackets ++;
+
+
+    int cnt_endl = 0;
+    for(char c: s) if(c == '\n') cnt_endl ++;
+    s.clear();
+
+    while(cnt_brackets --) s.push_back(']'); 
+    if(comma) s.push_back(',');
+    s.push_back('\n'); 
+
+    return s;
+}
+
+inline
+void _output_helper(std::vector<int>& shape, int p, std::vector<int>idx, std::ostream& o, const Tensor& t){
+    static int bracket_cnt = 0;
+    if(idx.empty()) bracket_cnt = shape.size();
+
+
+    if(p == shape.size() - 1) {
+        //output prefix
+        {
+            for(int i = shape.size() - bracket_cnt; i > 0; i --) o << ' ';
+            for(int i = 0; i < bracket_cnt; ++ i) o << '[';
+
+        }
+
+        //output data
+        {
+            for(int i = 0; i < shape[p]; ++ i) {
+                idx.push_back(i);
+                o << t(idx) ;
+                if(i != shape[p] - 1) o << ", ";
+                idx.pop_back();
+            }
+        }
+
+        //output end 
+        {
+            int cnt = 0;
+            for(int i = shape.size() - 1; i >= 0 ; -- i) {
+                if(idx[i] != shape[i] - 1) break;
+                cnt ++;
+            }
+            bracket_cnt = cnt;
+            while(cnt --)o <<']';
+            if(bracket_cnt != shape.size()){
+                o << ",";
+                for(int i = 0; i < bracket_cnt; ++ i) o << '\n';
+            }
+        }
+
+
+        return ;
+    }
+
+    for(int i = 0; i < shape[p]; ++ i) {
+
+        idx.push_back(i);
+        _output_helper(shape, p + 1, idx, o, t);
+        idx.pop_back();
+    }
 
 }
 
@@ -130,6 +195,10 @@ std::ostream& operator<<(std::ostream& o, const Tensor& t) {
     /*TODO
      *
      */
+    std::vector<int> idx;
+    auto shape = t.shape();
+
+    _output_helper(shape, 0, idx, o, t);
 
     return o;
 }

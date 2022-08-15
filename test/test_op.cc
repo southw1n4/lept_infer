@@ -148,7 +148,6 @@ bool test_relu() {
 
     auto y = Tensor({3, 3, 3, 3}); 
 
-
     return op(x) == z;
 }
 
@@ -163,6 +162,8 @@ void test_op() {
     TEST(test_relu);
     printf("PASS: %d/%d\n",op_true, op_cnt);
     printf("=========================TEST_OP=========================\n");
+    auto x = Tensor({3, 3, 3});
+    std::cout << x << std::endl;
 
 }
 
