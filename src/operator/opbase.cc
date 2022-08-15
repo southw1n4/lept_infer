@@ -129,6 +129,15 @@ Tensor exp(const Tensor& a) {
     return c;
 }
 
+Tensor sqrt(const Tensor& a) {
+    Tensor c(a);
+    float* ptr = (float*)c.data();
+    for(int i = 0; i < c.size(); ++ i)
+        ptr[i] = std::sqrt(ptr[i]);
+
+    return c;
+}
+
 Tensor tanh(const Tensor& a){
 
     Tensor c(a);

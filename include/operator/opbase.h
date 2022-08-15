@@ -21,6 +21,7 @@ Tensor mut(const Tensor&, const Tensor&);
 Tensor div(const Tensor&, const Tensor&);
 
 Tensor exp(const Tensor&);
+Tensor sqrt(const Tensor&);
 
 
 Tensor tanh(const Tensor&);

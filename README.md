@@ -27,7 +27,7 @@ make benchmark
 
 ```c++
 
-auto x = lept_infer::Tensor({3, 3, 3});
+auto x = leptinfer::Tensor({3, 3, 3});
 std::cout << x << std::endl;
 
 /*here is the output

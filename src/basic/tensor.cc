@@ -192,9 +192,6 @@ void _output_helper(std::vector<int>& shape, int p, std::vector<int>idx, std::os
 
 std::ostream& operator<<(std::ostream& o, const Tensor& t) {
 
-    /*TODO
-     *
-     */
     std::vector<int> idx;
     auto shape = t.shape();
 

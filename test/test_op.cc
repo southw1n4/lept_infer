@@ -1,30 +1,44 @@
+
 #include <cstdio>
 #include <cstdlib>
 #include <cmath>
 #include <functional>
 #include <numeric>
 #include <iostream>
+#include <cstring>
 
 #include "operator/linear.h"
 #include "operator/activate.h"
 #include "operator/conv.h"
 #include "operator/pool.h"
+#include "operator/norm.h"
 
 #include "basic/tensor.h"
 
 static int op_cnt = 0;
 static int op_true = 0;
+static int n_point = 53;
 
 using namespace leptinfer;
+
+#define OUT(num, status) \
+    do{\
+        for(int i = 0; i < (num); ++ i) printf("%c", '.');\
+        printf("[%s]\n", #status);\
+    }while(0)
+
 #define TEST(func) \
     do{\
+        int n_out_point = n_point - strlen(#func);\
         op_cnt ++;\
+        printf("%s", #func);\
         if(func()) {\
             op_true++;\
-            printf("%s\t.....................................[OK]\n", #func); \
+            OUT(n_out_point, OK); \
         }\
     else{\
-            printf("%s\t.................................[FAILED]\n", #func); \
+            n_out_point -= 4;\
+            OUT(n_out_point, FAILED); \
         }\
     }while(0)
 
@@ -151,6 +165,24 @@ bool test_relu() {
     return op(x) == z;
 }
 
+bool test_batchnrom2d() {
+    auto x = Tensor({2, 3, 2, 2}, {1, 2, 3, 4, 5 ,6, 7, 8, 9, 10, 11, 12,
+                                   1, 2, 3, 4, 5 ,6, 7, 8, 9, 10, 11, 12});
+    auto z = Tensor({2, 3, 2, 2},{-1.0588, -0.1863, 0.6863,  1.5588, -0.6588,  0.2137, 1.0863,  1.9588, -0.2588,  0.6137, 1.4863,  2.3588,
+                                  -1.0588, -0.1863, 0.6863,  1.5588, -0.6588,  0.2137, 1.0863,  1.9588, -0.2588,  0.6137, 1.4863,  2.3588});
+
+    auto op = BatchNorm2d(3);
+    auto gamma = Tensor({1, 3, 1, 1}, {0.25, 0.65, 1.05});
+    auto beta = Tensor({1, 3, 1, 1}, {1.0429, 1.0429, 1.0429});
+    op.set_gamma(gamma);
+    op.set_beta(beta);
+
+    return op(x) == z;
+
+}
+
+
+
 
 void test_op() {
     printf("=========================TEST_OP=========================\n");
@@ -160,11 +192,9 @@ void test_op() {
     TEST(test_conv2d);
     TEST(test_maxpool2d);
     TEST(test_relu);
+    TEST(test_batchnrom2d);
     printf("PASS: %d/%d\n",op_true, op_cnt);
     printf("=========================TEST_OP=========================\n");
-    auto x = Tensor({3, 3, 3});
-    std::cout << x << std::endl;
-
 }
 
 
