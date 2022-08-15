@@ -1,6 +1,7 @@
 #ifndef __OPERATOR_OP_BASE_H__
 #define __OPERATOR_OP_BASE_H__
 
+#include <vector>
 #include "basic/tensor.h"
 
 namespace leptinfer{
@@ -8,6 +9,9 @@ class Op{
  public:
     virtual ~Op(){};
     virtual Tensor operator()(const Tensor&) = 0;
+
+    std::vector<Op *> in;
+    std::vector<Op *> out;
 
 };
 
