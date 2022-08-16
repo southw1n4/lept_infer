@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.5)
 
 project(leptifner)
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 17)
 
 add_definitions(-DHAND)
 add_definitions(-g)
@@ -23,6 +23,10 @@ add_executable(infertest
 add_executable(inferbenchmark
     ${LEAN_FILE}
     ${BENCH_FILE}
+)
+
+target_link_libraries(infertest
+    protobuf
 )
 
 
