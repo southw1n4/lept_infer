@@ -26,9 +26,12 @@ add_executable(inferbenchmark
 )
 
 target_link_libraries(infertest
-    protobuf
+    libprotobuf.a
 )
 
+target_link_libraries(inferbenchmark
+    libprotobuf.a
+)
 
 add_custom_target(
     test

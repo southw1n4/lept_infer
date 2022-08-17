@@ -10,7 +10,7 @@
     }while(0)
 
 
-#define INFO(...) LOG_BASE(I,  __VA_ARGS__)
+#define INFO(...) (printf("[%c] ", 'I'),  printf(__VA_ARGS__))
 #define WRANING(...) LOG_BASE(W, __VA_ARGS__)
 #define ERROR(...) LOG_BASE(E, __VA_ARGS__)
 
