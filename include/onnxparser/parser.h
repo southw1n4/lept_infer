@@ -4,7 +4,10 @@
 #include <unordered_map>
 
 #include "net/netbase.h"
+#include "operator/opbase.h"
 #include "onnxparser/onnx.proto3.pb.h"
+
+
 
 namespace leptinfer{
 class OnnxParser{
@@ -20,7 +23,8 @@ private:
 
     Net* net_ = NULL;
     bool varbose_;
-    std::unordered_map<std::string, Tensor>  named_tensors_;
+    std::unordered_map<std::string, Tensor*>  named_tensors_;
+    std::unordered_map<std::string, Op*> named_ops_;
 
 
 };

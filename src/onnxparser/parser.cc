@@ -5,6 +5,7 @@
 
 #include "basic/tools.h"
 #include "onnxparser/onnx.proto3.pb.h"
+#include "onnxparser/parser_helper.h"
 
 
 namespace leptinfer{
@@ -16,9 +17,9 @@ Net* OnnxParser::parse(const std::string& file, bool varbose){
     net_ = NULL;
 
     ::onnx::ModelProto model_proto;
-    std::ifstream input("model_13.onnx", std::ios::in | std::ios::binary); 
+    std::ifstream input(file, std::ios::in | std::ios::binary); 
     if(!model_proto.ParseFromIstream(&input)) {
-        ERROR("failed to parse onnx file");
+        ERROR("failed to parse onnx file\n");
         return NULL;
     }
 
@@ -39,7 +40,7 @@ Net* OnnxParser::parse(const std::string& file, bool varbose){
         delete  net_;
         net_ = NULL;
 
-        ERROR("failed parse network model");
+        ERROR("failed parse network model\n");
         return NULL;
     }
 
@@ -47,7 +48,7 @@ Net* OnnxParser::parse(const std::string& file, bool varbose){
         delete  net_;
         net_ = NULL;
 
-        ERROR("failed parse network model");
+        ERROR("failed parse network model\n");
         return NULL;
     }
 
@@ -72,7 +73,24 @@ bool OnnxParser::parser_op(::onnx::GraphProto& grpgh) {
         if(varbose_) {
             INFO("parsing layer: %s\n", node_name.c_str());
         }
+
+        const std::string op_name = node.op_type();
+        if(op_name != "Conv") continue;
+
+        auto it_name = std::find(SUPPORT_OP_NAME.begin(), SUPPORT_OP_NAME.end(), op_name);
+        if(it_name == SUPPORT_OP_NAME.end()) {
+            ERROR("unsupported opeartor: %s", op_name.c_str());
+
+            return false;
+        }
+
+        auto it_func = SUPPROT_OP_FUNC.begin() + (it_name - SUPPORT_OP_NAME.begin());
+        auto op = (*it_func)(node, named_tensors_, named_ops_);
+
+        named_ops_[node_name] = op;
+        
     }
+
     return true;
 }
 }
