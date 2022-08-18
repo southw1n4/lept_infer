@@ -2,6 +2,8 @@
 #define __OPERATOR_OP_BASE_H__
 
 #include <vector>
+#include <unordered_map>
+
 #include "basic/tensor.h"
 
 namespace leptinfer{
@@ -10,8 +12,8 @@ class Op{
     virtual ~Op(){};
     virtual Tensor operator()(const Tensor&) = 0;
 
-    std::vector<Op *> in;
-    std::vector<Op *> out;
+    std::vector<Op *> next;
+    std::unordered_map<std::string, bool> output;
 
 };
 

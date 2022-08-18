@@ -6,13 +6,19 @@
 namespace leptinfer{
 class Conv2d: public Op{
  public:
-     Conv2d(int input_dims, int output_dims, int kernel_size, int stride, int padding, bool required_bias = false);
+     Conv2d(int input_dims, int output_dims, 
+            std::vector<int> kernel_size,
+            std::vector<int> stride,
+            std::vector<int> pads,
+            std::vector<int> dilations = {1, 1},
+            int group = 1,
+            bool required_bias = false);
      ~Conv2d();
      virtual Tensor operator()(const Tensor&);
 
  public:
-     void set_weight(const Tensor&);
-     void set_bias(const Tensor&);
+     void set_weight(Tensor*);
+     void set_bias(Tensor*);
  
 
  private: 

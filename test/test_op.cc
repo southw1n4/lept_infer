@@ -100,8 +100,8 @@ bool test_tanh() {
 
 bool test_conv2d() {
     auto x = Tensor({2, 3, 3, 3}, Tensor::tensor_type::TYPE_FP32, 1);
-    auto w = Tensor({3, 3, 3, 3}, Tensor::tensor_type::TYPE_FP32, 1);
-    auto b = Tensor({3}, {0, 1 ,2});
+    auto w = new Tensor({3, 3, 3, 3}, Tensor::tensor_type::TYPE_FP32, 1);
+    auto b = new Tensor({3}, {0, 1 ,2});
     auto z1 = Tensor({2, 3, 1, 1}, Tensor::tensor_type::TYPE_FP32, 27);
     auto z2 = Tensor({2, 3, 3, 3}, {12, 18, 12, 18, 27, 18, 12, 18, 12,
                                      12, 18, 12, 18, 27, 18, 12, 18, 12,
@@ -118,18 +118,21 @@ bool test_conv2d() {
                                      14, 20, 14, 20, 29, 20, 14, 20, 14});
                                      
 
-    auto op1 = Conv2d(3, 3, 3, 1, 0);
-    op1.set_weight(w);
+    auto op1 = Conv2d(3, 3, {3}, {1}, {0});
+    op1.set_weight(new Tensor(*w));
     bool flag1 = (z1 == op1(x));
 
-    auto op2 = Conv2d(3, 3, 3, 1, 1);
-    op2.set_weight(w);
+    auto op2 = Conv2d(3, 3, {3}, {1}, {1});
+    op2.set_weight(new Tensor(*w));
     bool flag2 = (z2 == op2(x));
 
-    auto op3 = Conv2d(3, 3, 3, 1, 1, true);
-    op3.set_weight(w);
-    op3.set_bias(b);
+    auto op3 = Conv2d(3, 3, {3}, {1}, {1}, {0}, 0, true);
+    op3.set_weight(new Tensor(*w));
+    op3.set_bias(new Tensor(*b));
     bool flag3 = (z3 == op3(x));
+
+    delete w;
+    delete b;
 
     return flag1 && flag2 && flag3;
 }

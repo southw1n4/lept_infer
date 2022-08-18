@@ -4,16 +4,20 @@
 
 
 namespace leptinfer{
-Conv2d::Conv2d(int input_dims, int output_dims, int kernel_size, int stride, int padding, bool required_bias):
-    input_dims_(input_dims), 
-    output_dims_(output_dims), 
-    kernel_size_(kernel_size),
-    stride_(stride),
-    padding_(padding),
-    required_bias_(required_bias)
-    {}
 
-
+Conv2d::Conv2d(int input_dims, int output_dims, 
+        std::vector<int> kernel_size,
+        std::vector<int> stride,
+        std::vector<int> pads,
+        std::vector<int> dilations,
+        int group,
+        bool required_bias){
+    input_dims_  = input_dims;
+    output_dims_ = output_dims;
+    kernel_size_ = kernel_size[0];
+    stride_      = stride[0];
+    padding_     = pads[0];
+}
 Conv2d::~Conv2d() {
     if(weight_ != NULL) delete weight_;
     if(bias_ != NULL) delete bias_;
@@ -98,15 +102,15 @@ void Conv2d::compute_local(int tgt_xcoord, int tgt_ycoord, float* src_ptr, float
 }
 
 
-void Conv2d::set_weight(const Tensor& a){
+void Conv2d::set_weight(Tensor* a){
     if(weight_ != NULL) delete weight_;
-    weight_ = new Tensor(a);
+    weight_ = a;
+
 }
 
-
-void Conv2d::set_bias(const Tensor& a){
+void Conv2d::set_bias(Tensor* a){
     required_bias_ = true;
     if(bias_ != NULL) delete bias_;
-    bias_ = new Tensor(a);
+    bias_ = a;
 }
 }

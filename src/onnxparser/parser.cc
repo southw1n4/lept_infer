@@ -1,6 +1,7 @@
 
 #include "onnxparser/parser.h"
 
+#include <basic/tensor.h>
 #include <fstream>
 
 #include "basic/tools.h"
@@ -62,6 +63,23 @@ Net* OnnxParser::parse(const std::string& file, bool varbose){
 
 bool OnnxParser::parser_tensor(::onnx::GraphProto& grpgh) {
 
+    for(int i = 0; i < grpgh.initializer_size(); ++ i) {
+        auto& tensor = grpgh.initializer(i);
+        auto& tensor_name = tensor.name();
+        std::vector<int> shapes;
+
+        for(int j = 0; j < tensor.dims_size(); ++ j) shapes.push_back(tensor.dims(j));
+        Tensor* _temp_tensor = new Tensor(shapes);
+
+        if(_temp_tensor == NULL || _temp_tensor->data() == NULL) {
+            ERROR("wrong when create a tensor!!");
+            return false;
+        }
+        memcpy(_temp_tensor->data(), tensor.raw_data().data(), _temp_tensor->size() * sizeof(float));
+
+        named_tensors_[tensor_name] = _temp_tensor;
+    }
+
     return true;
 }
 
@@ -86,8 +104,8 @@ bool OnnxParser::parser_op(::onnx::GraphProto& grpgh) {
 
         auto it_func = SUPPROT_OP_FUNC.begin() + (it_name - SUPPORT_OP_NAME.begin());
         auto op = (*it_func)(node, named_tensors_, named_ops_);
-
         named_ops_[node_name] = op;
+
         
     }
 
