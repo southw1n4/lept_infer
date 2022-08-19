@@ -11,6 +11,7 @@ class BatchNorm2d: public Op{
     ~BatchNorm2d();
 
     virtual Tensor operator()(const Tensor& a) override;
+    virtual void forward() override;
 
     void set_gamma(const Tensor&);
     void set_beta(const Tensor&);

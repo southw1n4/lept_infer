@@ -53,10 +53,8 @@ Net* OnnxParser::parse(const std::string& file, bool varbose){
         return NULL;
     }
 
+    input.close();
     INFO("finish parsing network model\n");
-
-    net_->top_sort(net_->ops);
-
 
     return net_;
 }
@@ -84,6 +82,12 @@ bool OnnxParser::parser_tensor(::onnx::GraphProto& grpgh) {
 }
 
 bool OnnxParser::parser_op(::onnx::GraphProto& grpgh) {
+
+    for(int i = 0; i < grpgh.output_size(); ++ i) {
+        auto output_name = grpgh.output(i).name();
+        output_name_[output_name] = true;
+    }
+
     for(int i = 0; i < grpgh.node_size(); ++ i) {
         auto node = grpgh.node(i);
         auto node_name = node.name();
@@ -93,7 +97,6 @@ bool OnnxParser::parser_op(::onnx::GraphProto& grpgh) {
         }
 
         const std::string op_name = node.op_type();
-        if(op_name != "Conv") continue;
 
         auto it_name = std::find(SUPPORT_OP_NAME.begin(), SUPPORT_OP_NAME.end(), op_name);
         if(it_name == SUPPORT_OP_NAME.end()) {
@@ -103,10 +106,31 @@ bool OnnxParser::parser_op(::onnx::GraphProto& grpgh) {
         }
 
         auto it_func = SUPPROT_OP_FUNC.begin() + (it_name - SUPPORT_OP_NAME.begin());
-        auto op = (*it_func)(node, named_tensors_, named_ops_);
-        named_ops_[node_name] = op;
+        auto op = (*it_func)(node, named_tensors_);
 
-        
+        for(int j = 0; j < node.input_size(); ++ j) {
+            auto input_name = node.input(j);
+            if(named_tensors_.count(input_name)) continue;
+
+            for(auto it_ops = named_ops_.begin(); it_ops != named_ops_.end(); ++ it_ops) {
+                if(it_ops->second->output.count(input_name)) {
+                    it_ops->second->next_op.push_back(op);
+                }
+            }
+        }
+
+        for(int j = 0; j < node.output_size(); ++ j) {
+            auto output_name = node.output(j);
+            op->output[output_name] = true;
+
+            if(output_name_.count(output_name)) {
+                op->is_output = true;
+                net_->output_idx.push_back(i);
+            }
+        }
+
+        named_ops_[node_name] = op;
+        net_->ops.push_back(op);
     }
 
     return true;

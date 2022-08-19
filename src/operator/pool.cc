@@ -5,7 +5,7 @@
 
 namespace leptinfer{
 MaxPool2d::MaxPool2d(int kernel_size, int stride, int padding):
-    kernel_size_(kernel_size), stride_(stride), padding_(padding){}
+    kernel_size_(kernel_size), stride_(stride), padding_(padding){now_cnt =all_cnt = 1;}
 
 
 Tensor MaxPool2d::operator()(const Tensor& x) {
@@ -65,4 +65,10 @@ void MaxPool2d::compute_local(int tgt_ycoord, int tgt_xcoord, float* tgt_ptr, fl
 #endif
 }
 
+
+void MaxPool2d::forward() {
+
+    auto y = (*this)(*in[0]);
+    notify(std::make_shared<Tensor>(y));
+}
 }

@@ -25,6 +25,7 @@ private:
     bool varbose_;
     std::unordered_map<std::string, Tensor*>  named_tensors_;
     std::unordered_map<std::string, Op*> named_ops_;
+    std::unordered_map<std::string, bool> output_name_;
 
 
 };

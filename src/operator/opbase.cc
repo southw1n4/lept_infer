@@ -1,15 +1,54 @@
 #include "operator/opbase.h"
 
 #include <cmath>
+#include <thread>
 
 #include "basic/tools.h"
 
 
 namespace leptinfer{
 
+Op::~Op() {
+    output.clear();
+    for(auto& _t : in) {
+        _t = NULL;
+    }
+}
+
+
+void Op::notify(std::shared_ptr<Tensor> x) {
+    status = true;
+
+    if(is_output) {
+        result = x;
+    }
+    for(auto& op : next_op) {
+        op->in.push_back(x);
+        op->wakeup();
+    }
+    for (int i = 0; i < in.size(); ++ i) {
+        in[i] = NULL;
+    }
+    in.clear();
+    x = NULL;
+}
+
+void Op::wakeup() {
+    now_cnt --;
+    if(now_cnt == 0) {
+        now_cnt = all_cnt;
+        std::thread run_op(run, this);
+        run_op.detach();
+    }
+}
+
+void Op::run(Op* op) {
+    op->forward();
+}
+
 Tensor  gemm(const Tensor& a, const Tensor& b) {
     if(a.shape().size() != 2 || a.shape().back() != b.shape()[0]) {
-        ERROR("dimension mismatch");
+        ERROR("dimension mismatch when gemm [%d, %d] and [%d, %d]\n", a.shape()[0], a.shape()[1], b.shape()[0], b.shape()[1]);
     }
     auto shape1 = a.shape(), shape2 = b.shape();
     int na = shape1[0], ma = shape1[1];

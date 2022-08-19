@@ -2,12 +2,14 @@
 
 #include "basic/tensor.h"
 #include "basic/tools.h"
+#include <iostream>
 
 
 namespace leptinfer{
 
 Linear::Linear(int input_dim, int output_dim, bool required_bias) {
     required_bias_ = required_bias;
+    now_cnt = all_cnt = 1;
 }
 
 Linear::~Linear() {
@@ -22,19 +24,26 @@ Linear::~Linear() {
     }
 }
 
-void Linear::set_weight(const Tensor& rhs) {
-    weight_ = new Tensor(rhs);
+void Linear::set_weight(Tensor* rhs) {
+    if(weight_ != NULL) delete weight_; 
+    weight_ = rhs;
 }
 
-void Linear::set_bias(const Tensor& rhs) {
+void Linear::set_bias(Tensor* rhs) {
     required_bias_ = true;
-    bias_ = new Tensor(rhs);
+    if(bias_ != NULL) delete bias_;
+    bias_ = rhs;
 }
 
 
 Tensor Linear::operator()(const Tensor& x) {
-
     return add(gemm(x, *weight_), *bias_);
+}
+
+void Linear::forward() {
+
+    auto y = (*this)(*in[0]);
+    notify(std::make_shared<Tensor>(y));
 }
 
 }

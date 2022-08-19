@@ -10,10 +10,11 @@ class Linear: public Op{
     Linear(int input_dim, int output_dim, bool required_bias = false);
     ~Linear();
     virtual Tensor operator()(const Tensor&) override;
+     virtual void forward() override;
 
  public:
-    void set_weight(const Tensor&);
-    void set_bias(const Tensor&);
+    void set_weight(Tensor*);
+    void set_bias(Tensor*);
 
  private:
     Tensor* weight_ = NULL;

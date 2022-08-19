@@ -14,7 +14,8 @@ class Conv2d: public Op{
             int group = 1,
             bool required_bias = false);
      ~Conv2d();
-     virtual Tensor operator()(const Tensor&);
+     virtual void forward() override;
+     virtual Tensor operator()(const Tensor&) override;
 
  public:
      void set_weight(Tensor*);

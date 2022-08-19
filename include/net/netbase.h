@@ -9,11 +9,12 @@ namespace leptinfer{
 
 class Net{
  public:
-    ~Net(){};
-    virtual Tensor operator()(const Tensor&);
-    static void top_sort(std::vector<Op*>&);
+    virtual ~Net();
+    virtual std::vector<Tensor> excute(const Tensor&);
 
     std::vector<Op*> ops; 
+    std::vector<int> output_idx;
+    std::vector<Tensor> output;
 };
 }
 

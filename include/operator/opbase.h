@@ -3,17 +3,29 @@
 
 #include <vector>
 #include <unordered_map>
+#include <memory>
 
 #include "basic/tensor.h"
 
 namespace leptinfer{
 class Op{
  public:
-    virtual ~Op(){};
-    virtual Tensor operator()(const Tensor&) = 0;
+    virtual ~Op();
+    virtual Tensor operator()(const Tensor& x) = 0;
+    virtual void forward() = 0;
 
-    std::vector<Op *> next;
+    void notify(std::shared_ptr<Tensor>);
+    void wakeup();
+    static void run(Op*);
+
+    std::vector<Op *> next_op;
     std::unordered_map<std::string, bool> output;
+    std::vector<std::shared_ptr<Tensor>> in;
+    int now_cnt = 0;
+    int all_cnt = 0;
+    bool status = false;
+    bool is_output = false;
+    std::shared_ptr<Tensor> result = NULL;
 
 };
 

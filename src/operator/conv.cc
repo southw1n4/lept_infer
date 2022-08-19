@@ -17,7 +17,15 @@ Conv2d::Conv2d(int input_dims, int output_dims,
     kernel_size_ = kernel_size[0];
     stride_      = stride[0];
     padding_     = pads[0];
+    all_cnt = now_cnt = 1;
 }
+
+void Conv2d::forward() {
+
+    auto y = (*this)(*in[0]);
+    notify(std::make_shared<Tensor>(y));
+}
+
 Conv2d::~Conv2d() {
     if(weight_ != NULL) delete weight_;
     if(bias_ != NULL) delete bias_;

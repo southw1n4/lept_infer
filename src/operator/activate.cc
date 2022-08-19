@@ -9,10 +9,23 @@ Tensor Softmax::operator()(const Tensor& x) {
     return div(exp(x), sum(exp(x), dim_));
 }
 
+void Softmax::forward() {
+
+    auto y = (*this)(*in[0]);
+    in[0] = NULL;
+    notify(std::make_shared<Tensor>(y));
+}
+
 Tensor TanH::operator()(const Tensor& x){
     return tanh(x);
 }
 
+void TanH::forward() {
+
+    auto y = (*this)(*in[0]);
+    in[0] = NULL;
+    notify(std::make_shared<Tensor>(y));
+}
 
 Tensor ReLU::operator()(const Tensor& x){
 
@@ -27,6 +40,13 @@ Tensor ReLU::operator()(const Tensor& x){
 #endif
 
     return y;
+}
+
+void ReLU::forward() {
+
+    auto y = (*this)(*in[0]);
+    in[0] = NULL;
+    notify(std::make_shared<Tensor>(y));
 }
 
 }

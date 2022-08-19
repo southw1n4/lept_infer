@@ -2,12 +2,16 @@
 
 #include "basic/tools.h"
 #include "operator/conv.h"
+#include "operator/activate.h"
+#include "operator/linear.h"
+#include "operator/flatten.h"
+
+#define PARSE(name) \
+        Op* parse_##name(::onnx::NodeProto& node, \
+                std::unordered_map<std::string, Tensor*>& named_tensors)
 
 namespace leptinfer{
-Op* parse_conv(::onnx::NodeProto& node,
-                std::unordered_map<std::string, Tensor*>& named_tensors,
-                std::unordered_map<std::string, Op*>& named_ops){
-
+PARSE(conv){
     std::vector<int> dilations, kernel_shape, pads, strides;
     int group;
 
@@ -43,10 +47,8 @@ Op* parse_conv(::onnx::NodeProto& node,
         }
     }
 
-    std::string x = node.input(0);
     std::string w = node.input(1);
     std::string b = node.input(2);
-    std::string y = node.output(0);
     int input_dims = named_tensors[w]->shape()[1];
     int output_dims = named_tensors[w]->shape()[0];
 
@@ -54,16 +56,36 @@ Op* parse_conv(::onnx::NodeProto& node,
     next_op->set_weight(named_tensors[w]);
     next_op->set_bias(named_tensors[b]);
 
-    for(auto it = named_ops.begin(); it != named_ops.end(); ++ it) {
-        Op* prev_op = it->second;
-        if(prev_op->output.count(x)) {
-            prev_op->next.push_back(next_op);
-        }
-    }
-
-    next_op->output[y] = true;
     return next_op;
 }
 
+PARSE(relu) {
+
+    return new ReLU();
+}
+
+PARSE(gemm) {
+    std::string w = node.input(1);
+    std::string b = node.input(2);
+
+    int input_dims = named_tensors[w]->shape()[1];
+    int output_dims = named_tensors[w]->shape()[0];
+
+    Linear* next_op = new Linear(input_dims, output_dims, true);
+    Tensor new_w(named_tensors[w]->T());
+    named_tensors[b]->reshape({1, output_dims});
+    delete named_tensors[w];
+
+    next_op->set_weight(new Tensor(new_w));
+    next_op->set_bias(named_tensors[b]);
+
+    return next_op;
+}
+
+
+PARSE(flatten) {
+
+    return new Flatten();
+}
 
 }

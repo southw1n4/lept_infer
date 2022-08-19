@@ -27,10 +27,12 @@ add_executable(inferbenchmark
 
 target_link_libraries(infertest
     libprotobuf.a
+    pthread
 )
 
 target_link_libraries(inferbenchmark
     libprotobuf.a
+    pthread
 )
 
 add_custom_target(

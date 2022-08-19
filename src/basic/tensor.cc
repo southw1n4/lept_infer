@@ -137,7 +137,29 @@ std::string _fix(std::string s) {
     return s;
 }
 
-inline
+Tensor Tensor::T() {
+    Tensor y({shape_[1], shape_[0]});
+    float* p1 = (float *)y.data_;
+    float* p2 = (float *)data_; 
+    for(int i = 0;  i < shape_[1]; ++ i) {
+        for(int j = 0; j < shape_[0]; ++ j) {
+            p1[i * shape_[0] + j] = p2[j * shape_[1] + i];
+        }
+    }
+    return y;
+}
+
+void Tensor::reshape(const std::vector<int>& shape) {
+    int s1 = shape[0] * shape[1];
+
+    if(s1 != size_ / 4){
+        ERROR("cannot reshape between size: %d and size %d\n", s1, (int)size_ / 4);
+        exit(0);
+    }
+    shape_ = shape;
+}
+
+
 void _output_helper(std::vector<int>& shape, int p, std::vector<int>idx, std::ostream& o, const Tensor& t){
     static int bracket_cnt = 0;
     if(idx.empty()) bracket_cnt = shape.size();
@@ -198,6 +220,17 @@ std::ostream& operator<<(std::ostream& o, const Tensor& t) {
     _output_helper(shape, 0, idx, o, t);
 
     return o;
+}
+
+std::ostream& operator<<(std::ostream& o, std::vector<int>& s){
+
+    o << '[';
+    for(int i = 0; i < s.size(); ++ i) {
+        if(i == s.size() - 1) o << s[i] << ']';
+        else o << s[i] << ", ";
+    }
+    return o;
+
 }
 
 }

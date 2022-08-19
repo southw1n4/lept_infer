@@ -39,6 +39,8 @@ class Tensor{
      int size() const {return size_ / 4;}
 
 public:
+     Tensor T();
+     void reshape(const std::vector<int>&);
      Tensor& operator=(const Tensor& rhs);
      bool operator==(const Tensor& rhs);
      float& operator()(std::vector<int>);
@@ -57,6 +59,7 @@ public:
 };
 
 std::ostream& operator <<(std::ostream&, const Tensor&);
+std::ostream& operator<<(std::ostream& o, std::vector<int>& s);
 }
 
 #endif

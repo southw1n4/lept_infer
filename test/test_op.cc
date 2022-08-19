@@ -57,8 +57,8 @@ Tensor random_tenosr(std::vector<int> shape, int len = 2) {
 bool test_linear(){
     auto op = leptinfer::Linear(2, 3);
     auto x = Tensor({3, 2}, {1, 2, 3, 4, 5, 6});
-    op.set_weight(Tensor({2, 3}, {6, 5, 4, 3 ,2, 1}));
-    op.set_bias(Tensor({1, 3}, {0.4, 0.5, 0.6}));
+    op.set_weight(new Tensor({2, 3}, {6, 5, 4, 3 ,2, 1}));
+    op.set_bias(new Tensor({1, 3}, {0.4, 0.5, 0.6}));
 
     return op(x) == Tensor({3, 3}, {12.4, 9.5, 6.6,
                                     30.4, 23.5, 16.6,

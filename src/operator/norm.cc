@@ -5,7 +5,7 @@
 
 namespace leptinfer{
 BatchNorm2d::BatchNorm2d(int num_features, float eps):
-    num_features_(num_features), eps_(eps){};
+    num_features_(num_features), eps_(eps){now_cnt = all_cnt = 1;}
 
 BatchNorm2d::~BatchNorm2d(){
     if(beta_ != NULL){
@@ -17,6 +17,12 @@ BatchNorm2d::~BatchNorm2d(){
         delete gamma_;
         gamma_ = NULL;
     }
+}
+
+void BatchNorm2d::forward() {
+
+    auto y = (*this)(*in[0]);
+    notify(std::make_shared<Tensor>(y));
 }
 
 void BatchNorm2d::set_gamma(const Tensor& a) {

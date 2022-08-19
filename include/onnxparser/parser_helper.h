@@ -7,30 +7,32 @@
 #include "operator/opbase.h"
 #include "onnxparser/onnx.proto3.pb.h"
 
+
+
 #define __SUPPORT_OP_NAME \
-    "Conv"
+    "Conv", "Relu", "Gemm", "Flatten"
 
 #define __SUPPORT_OP_FUNC \
-    parse_conv 
+    parse_conv, parse_relu, parse_gemm, parse_flatten
+
+#define REGISTER(name) \
+        Op* parse_##name(::onnx::NodeProto&, \
+                     std::unordered_map<std::string, Tensor*>&);
 
 
 namespace leptinfer{
 
-using OP_FUNC_PTR = Op*(*)(::onnx::NodeProto&,
-                           std::unordered_map<std::string, Tensor*>&,
-                           std::unordered_map<std::string, Op*>&); 
-using OP_FUNC_NAME = std::string;
+REGISTER(relu)
+REGISTER(conv)
+REGISTER(gemm)
+REGISTER(flatten)
 
 
+static std::vector<Op*(*)(::onnx::NodeProto&, \
+                          std::unordered_map<std::string, Tensor*>&)> \
+                                SUPPROT_OP_FUNC = {__SUPPORT_OP_FUNC};
+static std::vector<std::string> SUPPORT_OP_NAME = {__SUPPORT_OP_NAME};
 
-
-Op* parse_conv(::onnx::NodeProto& node,
-                std::unordered_map<std::string, Tensor*>& named_tensors,
-                std::unordered_map<std::string, Op*>& named_ops);
-
-
-const std::vector<OP_FUNC_PTR> SUPPROT_OP_FUNC = {__SUPPORT_OP_FUNC};
-const std::vector<OP_FUNC_NAME> SUPPORT_OP_NAME = {__SUPPORT_OP_NAME};
 }
 
 
