@@ -11,7 +11,7 @@ Net::~Net() {
         delete op;
     }
 }
-std::vector<Tensor> Net::excute(const Tensor& a){
+std::vector<Tensor> Net::inference(const Tensor& a){
 
     ops[0]->in.push_back(std::make_shared<Tensor>(a));
     ops[0]->forward();

@@ -10,7 +10,7 @@ namespace leptinfer{
 class Net{
  public:
     virtual ~Net();
-    virtual std::vector<Tensor> excute(const Tensor&);
+    virtual std::vector<Tensor> inference(const Tensor&);
 
     std::vector<Op*> ops; 
     std::vector<int> output_idx;
