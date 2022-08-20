@@ -11,7 +11,6 @@ include_directories(
 )
 
 file(GLOB_RECURSE LEAN_FILE ${PROJECT_SOURCE_DIR}/../src/*.cc)
-message(${LEAN_FILE})
 
 
 add_executable(demo
