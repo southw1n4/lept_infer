@@ -13,8 +13,11 @@ Net::~Net() {
 }
 std::vector<Tensor> Net::inference(const Tensor& a){
 
+    output.clear();
     ops[0]->in.push_back(std::make_shared<Tensor>(a));
     ops[0]->forward();
+    ops[0]->in[0] = NULL;
+    ops[0]->in.clear();
 
     while(true) {
         bool flag = true;
@@ -34,8 +37,6 @@ std::vector<Tensor> Net::inference(const Tensor& a){
             ops[i]->result = NULL;
         }
     }; 
-
-
     return output;
 }
 

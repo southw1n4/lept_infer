@@ -5,7 +5,7 @@
 using namespace leptinfer;
 
 void test_onnxparser(){
-    const std::string model_path = "../models/mnist.onnx";
+    const std::string model_path = "../example/models/mnist.onnx";
     auto onnx_parser = new OnnxParser();
     auto net = onnx_parser->parse(model_path);
     auto output = net->inference(Tensor({1, 1, 28, 28}));
