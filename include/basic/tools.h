@@ -5,7 +5,7 @@
 
 #define LOG_BASE(type, ...)\
     do{ \
-        printf("[%s] [%s:%d]: ", #type, __FILE__, __LINE__); \
+        printf("[%s] [%s:%d] ", #type, __FILE__, __LINE__); \
         printf(__VA_ARGS__); \
     }while(0)
 

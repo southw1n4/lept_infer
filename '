@@ -7,7 +7,6 @@
 #include "operator/flatten.h"
 #include "operator/add.h"
 #include "operator/div.h"
-#include "operator/clip.h"
 
 #define PARSE(name) \
         Op* parse_##name(::onnx::NodeProto& node, \
@@ -106,14 +105,8 @@ PARSE(add) {
 }
 
 PARSE(clip) {
-    std::string in1 = node.input(0);
-    std::string in2 = node.input(1);
 
-    Clip* next_op = new Clip(1);
-
-    next_op->set_low(named_tensors[in1]);
-    next_op->set_up(named_tensors[in2]);
-    return next_op;
+    return new Flatten();
 }
 
 PARSE(div) {

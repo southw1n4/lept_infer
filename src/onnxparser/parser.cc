@@ -70,7 +70,7 @@ bool OnnxParser::parser_tensor(::onnx::GraphProto& grpgh) {
         Tensor* _temp_tensor = new Tensor(shapes);
 
         if(_temp_tensor == NULL || _temp_tensor->data() == NULL) {
-            ERROR("wrong when create a tensor!!");
+            ERROR("wrong when create a tensor!!\n");
             return false;
         }
         memcpy(_temp_tensor->data(), tensor.raw_data().data(), _temp_tensor->size() * sizeof(float));
@@ -92,6 +92,7 @@ bool OnnxParser::parser_op(::onnx::GraphProto& grpgh) {
         auto node = grpgh.node(i);
         auto node_name = node.name();
 
+
         if(varbose_) {
             INFO("parsing layer: %s\n", node_name.c_str());
         }
@@ -100,13 +101,15 @@ bool OnnxParser::parser_op(::onnx::GraphProto& grpgh) {
 
         auto it_name = std::find(SUPPORT_OP_NAME.begin(), SUPPORT_OP_NAME.end(), op_name);
         if(it_name == SUPPORT_OP_NAME.end()) {
-            ERROR("unsupported opeartor: %s", op_name.c_str());
+            ERROR("unsupported opeartor: %s\n", op_name.c_str());
 
             return false;
         }
-
         auto it_func = SUPPROT_OP_FUNC.begin() + (it_name - SUPPORT_OP_NAME.begin());
         auto op = (*it_func)(node, named_tensors_);
+        if(op == NULL){
+            continue;
+        }
 
         for(int j = 0; j < node.input_size(); ++ j) {
             auto input_name = node.input(j);
