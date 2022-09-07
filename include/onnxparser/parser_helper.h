@@ -10,10 +10,10 @@
 
 
 #define __SUPPORT_OP_NAME \
-    "Conv", "Relu", "Gemm", "Flatten", "Add", "Clip", "Div", "Constant"
+    "Conv", "Relu", "Gemm", "Flatten", "Add", "Clip", "Div", "Constant", "Mul"
 
 #define __SUPPORT_OP_FUNC \
-    parse_conv, parse_relu, parse_gemm, parse_flatten, parse_add, parse_clip, parse_div, parse_constant
+    parse_conv, parse_relu, parse_gemm, parse_flatten, parse_add, parse_clip, parse_div, parse_constant, parse_mul
 
 #define REGISTER(name) \
         Op* parse_##name(::onnx::NodeProto&, \
@@ -30,6 +30,7 @@ REGISTER(add)
 REGISTER(clip)
 REGISTER(div)
 REGISTER(constant)
+REGISTER(mul)
 
 
 static std::vector<Op*(*)(::onnx::NodeProto&, \

@@ -8,6 +8,7 @@
 #include "operator/add.h"
 #include "operator/div.h"
 #include "operator/clip.h"
+#include "operator/multiply.h"
 
 #define PARSE(name) \
         Op* parse_##name(::onnx::NodeProto& node, \
@@ -98,6 +99,21 @@ PARSE(add) {
         cnt --;
     }
     Add* next_op = new Add(cnt);
+    if(named_tensors.count(in2)){ 
+        next_op->set_constant(named_tensors[in2]);
+    }
+
+    return next_op;
+}
+
+PARSE(mul) {
+    std::string in1 = node.input(0);
+    std::string in2 = node.input(1);
+    int cnt = 2;
+    if(named_tensors.count(in2)){ 
+        cnt --;
+    }
+    Mul* next_op = new Mul(cnt);
     if(named_tensors.count(in2)){ 
         next_op->set_constant(named_tensors[in2]);
     }
