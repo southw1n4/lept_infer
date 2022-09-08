@@ -10,10 +10,12 @@
 
 
 #define __SUPPORT_OP_NAME \
-    "Conv", "Relu", "Gemm", "Flatten", "Add", "Clip", "Div", "Constant", "Mul"
+    "Conv", "Relu", "Gemm", "Flatten", "Add", "Clip", "Div", "Constant", "Mul", "GlobalAveragePool", "BatchNormalization"
 
 #define __SUPPORT_OP_FUNC \
-    parse_conv, parse_relu, parse_gemm, parse_flatten, parse_add, parse_clip, parse_div, parse_constant, parse_mul
+    parse_conv, parse_relu, parse_gemm,     parse_flatten, parse_add,\
+    parse_clip, parse_div,  parse_constant, parse_mul,     parse_avg_pool,\
+    parse_batch_norm
 
 #define REGISTER(name) \
         Op* parse_##name(::onnx::NodeProto&, \
@@ -31,6 +33,8 @@ REGISTER(clip)
 REGISTER(div)
 REGISTER(constant)
 REGISTER(mul)
+REGISTER(avg_pool)
+REGISTER(batch_norm)
 
 
 static std::vector<Op*(*)(::onnx::NodeProto&, \

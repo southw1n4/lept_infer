@@ -9,6 +9,7 @@
 #include "operator/div.h"
 #include "operator/clip.h"
 #include "operator/multiply.h"
+#include "operator/pool.h"
 
 #define PARSE(name) \
         Op* parse_##name(::onnx::NodeProto& node, \
@@ -47,18 +48,21 @@ PARSE(conv){
                     break;
                 }
             default:
-                ERROR("unsupported attribute: %s", name.c_str());
+                ERROR("unsupported attribute: %s\n", name.c_str());
         }
     }
 
     std::string w = node.input(1);
-    std::string b = node.input(2);
     int input_dims = named_tensors[w]->shape()[1];
     int output_dims = named_tensors[w]->shape()[0];
 
     Conv2d* next_op = new Conv2d(input_dims, output_dims, kernel_shape, strides, pads, dilations, group);
     next_op->set_weight(named_tensors[w]);
-    next_op->set_bias(named_tensors[b]);
+
+    if(node.input_size() > 2){
+        std::string b = node.input(2);
+        next_op->set_bias(named_tensors[b]);
+    }
 
     return next_op;
 }
@@ -160,5 +164,15 @@ PARSE(constant){
     named_tensors[node.output(0)] = _temp_tensor;
 
     return NULL;
+}
+
+PARSE(avg_pool){
+    int kernel_size = 0;
+    if(node.attribute_size() == 0) kernel_size = -1;
+    return new AvgPool2d(kernel_size, 1, 0);
+}
+
+PARSE(batch_norm){
+
 }
 }

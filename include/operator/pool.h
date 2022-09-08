@@ -20,6 +20,23 @@ class MaxPool2d: public Op{
      int stride_;
 
 };
+
+class AvgPool2d: public Op{
+ public:
+     AvgPool2d(int kernel_size, int stride, int padding);
+     ~AvgPool2d(){};
+
+     virtual Tensor operator()(const Tensor&) override;
+     virtual void forward() override;
+     void compute_local(int tgt_ycoord, int tgt_xcoord, float* tgt_ptr, float* src_ptr, int src_w, int src_h);
+
+ private:
+     int kernel_size_;
+     int padding_;
+     int stride_;
+
+
+};
 }
 
 
