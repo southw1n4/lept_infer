@@ -177,8 +177,8 @@ bool test_batchnrom2d() {
     auto op = BatchNorm2d(3);
     auto gamma = Tensor({1, 3, 1, 1}, {0.25, 0.65, 1.05});
     auto beta = Tensor({1, 3, 1, 1}, {1.0429, 1.0429, 1.0429});
-    op.set_gamma(gamma);
-    op.set_beta(beta);
+    op.set_gamma(new Tensor(gamma));
+    op.set_beta(new Tensor(beta));
 
     return op(x) == z;
 

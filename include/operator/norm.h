@@ -13,14 +13,18 @@ class BatchNorm2d: public Op{
     virtual Tensor operator()(const Tensor& a) override;
     virtual void forward() override;
 
-    void set_gamma(const Tensor&);
-    void set_beta(const Tensor&);
+    void set_gamma(Tensor*);
+    void set_beta(Tensor*);
+    void set_running_mean(Tensor*);
+    void set_running_var(Tensor*);
 
  private:
     int num_features_;
     float eps_;
     Tensor* gamma_ = NULL;
     Tensor* beta_ = NULL;
+    Tensor* running_mean_ = NULL;
+    Tensor* running_var_ = NULL;
 
 };
 }

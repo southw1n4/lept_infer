@@ -25,16 +25,25 @@ void BatchNorm2d::forward() {
     notify(std::make_shared<Tensor>(y));
 }
 
-void BatchNorm2d::set_gamma(const Tensor& a) {
+void BatchNorm2d::set_gamma(Tensor* a) {
     if(gamma_ != NULL) delete gamma_;
-    gamma_ = new Tensor(a);
+    gamma_ = a;
 }
 
-void BatchNorm2d::set_beta(const Tensor& a) {
+void BatchNorm2d::set_beta(Tensor* a) {
     if(beta_ != NULL) delete beta_;
-    beta_ = new Tensor(a);
+    beta_ = a;
+}
+void BatchNorm2d::set_running_mean(Tensor* a) {
+    if(running_mean_ != NULL) delete running_mean_;
+    running_mean_ = a;
 }
 
+
+void BatchNorm2d::set_running_var(Tensor* a) {
+    if(running_var_ != NULL) delete running_var_;
+    running_var_ = a;
+}
 Tensor BatchNorm2d::operator()(const Tensor& x) {
     Tensor y(x);
     
@@ -51,14 +60,10 @@ Tensor BatchNorm2d::operator()(const Tensor& x) {
     const int W = shape[3];
 
     auto EPS = Tensor({1, C, 1, 1}, Tensor::tensor_type::TYPE_FP32, eps_);
-    auto channel_sum = sum(sum(sum(x, 2), 3), 0);
+    y = sub(x, *running_mean_);
+    y = div(y, sqrt(add(*running_var_, EPS)));
+    y = add(mut(y, *beta_), *gamma_);
 
-    auto channel_mean = div(channel_sum, Tensor({1, C, 1, 1}, Tensor::tensor_type::TYPE_FP32, B * H * W));
-    auto x_demean_pow = mut(sub(x, channel_mean), sub(x, channel_mean));
-    auto channel_var = div(sum(sum(sum(x_demean_pow, 2), 3), 0), Tensor({1, C, 1, 1}, Tensor::tensor_type::TYPE_FP32, B * H * W - 1));
-
-    y = div(sub(y, channel_mean), add(sqrt(channel_var), EPS));
-    y = add(mut(*beta_, y), *gamma_);
 
 #endif
     return y;
