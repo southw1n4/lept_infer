@@ -2,7 +2,6 @@
 
 #include <numeric>
 #include <functional>
-#include <iostream>
 
 namespace leptinfer{
 

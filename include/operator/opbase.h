@@ -18,6 +18,7 @@ class Op{
     void wakeup();
     static void run(Op*);
 
+    std::string op_name_;
     std::vector<Op *> next_op;
     std::unordered_map<std::string, bool> output;
     std::vector<std::shared_ptr<Tensor>> in;

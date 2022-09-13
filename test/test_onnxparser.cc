@@ -9,6 +9,10 @@ void test_onnxparser(){
     auto onnx_parser = new OnnxParser();
     auto net = onnx_parser->parse(model_path, true);
 
+    auto x = Tensor({1, 3, 256, 256});
+    auto y = net->inference(x);
+
+    std::cout << y[0] << std::endl;
 
     delete net;
     delete onnx_parser;

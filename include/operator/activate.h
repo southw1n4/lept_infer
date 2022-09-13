@@ -34,6 +34,18 @@ class ReLU: public Op{
 
 };
 
+
+class ELU: public Op{
+ public:
+     ELU(float alpha){all_cnt = now_cnt = 1;alpha_ = alpha;}
+     ~ELU(){};
+
+     virtual Tensor operator()(const Tensor&) override;
+     virtual void forward() override;
+ private:
+     float alpha_;
+
+};
 }
 
 #endif

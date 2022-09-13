@@ -110,6 +110,7 @@ bool OnnxParser::parser_op(::onnx::GraphProto& grpgh) {
         if(op == NULL){
             continue;
         }
+        op->op_name_ = node_name;
 
         for(int j = 0; j < node.input_size(); ++ j) {
             auto input_name = node.input(j);

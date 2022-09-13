@@ -102,7 +102,8 @@ void _base(std::vector<int>& shape, std::vector<int>& idx, int p, const Tensor& 
  */
 Tensor asmd_base(const Tensor& a, const Tensor& b, int op) {
     if(a.shape().size() != b.shape().size()) {
-        ERROR("dimension mismatch");
+        ERROR("dimension mismatch\n");
+        exit(0);
     }
     std::vector<int> sa = a.shape();
     std::vector<int> sb = b.shape();

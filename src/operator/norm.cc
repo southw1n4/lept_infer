@@ -1,7 +1,6 @@
 #include "operator/norm.h"
 
 #include "basic/tools.h"
-#include <iostream>
 
 namespace leptinfer{
 BatchNorm2d::BatchNorm2d(int num_features, float eps):
@@ -45,11 +44,23 @@ void BatchNorm2d::set_running_var(Tensor* a) {
     running_var_ = a;
 }
 Tensor BatchNorm2d::operator()(const Tensor& x) {
+    int dims1 = gamma_->shape().size();
+    int dims2 = x.shape().size(); 
+
+    if(dims2 != 4 && dims2 != 2) {
+        ERROR("wrong shape\n");
+        exit(0);
+    }
+    std::vector<int> new_shape = {1, num_features_};
+    if(dims1 == 1){
+        if(dims2 == 4) new_shape = {1, num_features_, 1, 1};
+        gamma_->reshape(new_shape);
+        beta_->reshape(new_shape);
+        running_var_->reshape(new_shape);
+        running_mean_->reshape(new_shape);
+    }
     Tensor y(x);
     
-    if(x.shape().size() != 4) {
-        ERROR("wrong shape");
-    }
 
 #ifdef HAND
 
@@ -59,10 +70,10 @@ Tensor BatchNorm2d::operator()(const Tensor& x) {
     const int H = shape[2];
     const int W = shape[3];
 
-    auto EPS = Tensor({1, C, 1, 1}, Tensor::tensor_type::TYPE_FP32, eps_);
+    auto EPS = Tensor(new_shape, Tensor::tensor_type::TYPE_FP32, eps_);
     y = sub(x, *running_mean_);
     y = div(y, sqrt(add(*running_var_, EPS)));
-    y = add(mut(y, *beta_), *gamma_);
+    y = add(mut(y, *gamma_), *beta_);
 
 
 #endif

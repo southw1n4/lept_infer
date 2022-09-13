@@ -1,6 +1,7 @@
 #include "operator/activate.h"
 
 #include <stdio.h>
+#include <cmath>
 
 
 namespace leptinfer{
@@ -49,5 +50,28 @@ void ReLU::forward() {
     notify(std::make_shared<Tensor>(y));
 }
 
+
+Tensor ELU::operator()(const Tensor& x){
+
+    Tensor y(x);
+
+#ifdef HAND
+    int size = y.size();
+    float* data = (float *)y.data();
+    for(int i = 0; i < size; ++ i){ 
+        if(data[i] <= 0)
+            data[i] = alpha_ * (std::exp(data[i]) - 1);
+    }
+#endif
+
+    return y;
+}
+
+void ELU::forward() {
+
+    auto y = (*this)(*in[0]);
+    in[0] = NULL;
+    notify(std::make_shared<Tensor>(y));
+}
 }
 

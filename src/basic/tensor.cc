@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <cstring>
 #include <string>
+#include <iostream>
 
 #include "basic/tools.h"
 
@@ -150,7 +151,7 @@ Tensor Tensor::T() {
 }
 
 void Tensor::reshape(const std::vector<int>& shape) {
-    int s1 = shape[0] * shape[1];
+    int s1 = std::accumulate(shape.begin(), shape.end(), 1, std::multiplies<int>());
 
     if(s1 != size_ / 4){
         ERROR("cannot reshape between size: %d and size %d\n", s1, (int)size_ / 4);

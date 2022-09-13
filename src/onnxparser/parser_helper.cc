@@ -1,5 +1,7 @@
 #include "onnxparser/parser_helper.h"
 
+#include <cmath>
+
 #include "basic/tools.h"
 #include "operator/conv.h"
 #include "operator/activate.h"
@@ -10,6 +12,8 @@
 #include "operator/clip.h"
 #include "operator/multiply.h"
 #include "operator/pool.h"
+#include "operator/cat.h"
+#include "operator/norm.h"
 
 #define PARSE(name) \
         Op* parse_##name(::onnx::NodeProto& node, \
@@ -126,8 +130,8 @@ PARSE(mul) {
 }
 
 PARSE(clip) {
-    std::string in1 = node.input(0);
-    std::string in2 = node.input(1);
+    std::string in1 = node.input(1);
+    std::string in2 = node.input(2);
 
     Clip* next_op = new Clip(1);
 
@@ -163,6 +167,7 @@ PARSE(constant){
     memcpy(_temp_tensor->data(), tensor.raw_data().data(), _temp_tensor->size() * sizeof(float));
     named_tensors[node.output(0)] = _temp_tensor;
 
+
     return NULL;
 }
 
@@ -174,5 +179,27 @@ PARSE(avg_pool){
 
 PARSE(batch_norm){
 
+    std::string gamma= node.input(1);
+    std::string beta = node.input(2);
+    std::string running_mean = node.input(3);
+    std::string running_val = node.input(4);
+    int num_features = named_tensors[gamma]->shape()[0];
+    BatchNorm2d* next_op  = new BatchNorm2d(num_features);
+
+    next_op->set_gamma(named_tensors[gamma]);
+    next_op->set_beta(named_tensors[beta]);
+    next_op->set_running_mean(named_tensors[running_mean]);
+    next_op->set_running_var(named_tensors[running_val]);
+
+    return next_op;
+}
+
+PARSE(elu){
+    return new ELU(node.attribute(0).i());
+}
+
+PARSE(cat) {
+    return new Cat(2, node.attribute(0).i());
 }
 }
+
